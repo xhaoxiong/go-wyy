@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
-		commentsJson:=comment.GetComments()
-		fmt.Println(commentsJson)
+		comment,err:=comment.GetComments("404465600",0,20)
+		if err!=nil{
+			panic(err)
+		}
+		fmt.Println(comment.Total)
 	}

@@ -1,34 +1,55 @@
 package models
 
-type Comments struct {
-	IsMusician  bool          `json:"is_musician"`
-	UserId      int64         `json:"user_id"`
-	TopComments []string      `json:"top_comments"`
-	MoreHot     bool          `json:"more_hot"`
-	HotComments []*HotComment `json:"hot_comments"`
+type Comment struct {
+	IsMusician  bool           `json:"isMusician"`
+	UserId      int32          `json:"userId"`
+	TopComments []string       `json:"topComments"`
+	MoreHot     bool           `json:"moreHot"`
+	HotComments []*HotComments `json:"hotComments"`
+	Code        int            `json:"code"`
+	Comments    []*Comments    `json:"comments"`
+	Total       int64          `json:"total"`
+	More        bool           `json:"more"`
 }
 
-type HotComment struct {
-	User       *User    `json:"user"`
-	BeReplied  []string `json:"be_replied"`
-	LikedCount int64    `json:"liked_count"`
-	Liked      bool     `json:"liked"`
-	CommentId  int64    `json:"comment_id"`
-	Time       int64    `json:"time"`
-	Content    string   `json:"content"`
+type Comments struct {
+	User               *User        `json:"user"`
+	BeReplied          []*BeReplied `json:"beReplied"`
+	Time               int64        `json:"time"`
+	LikedCount         int          `json:"likedCount"`
+	Liked              bool         `json:"liked"`
+	CommentId          int64        `json:"commentId"`
+	Content            string       `json:"content"`
+	IsRemoveHotComment bool         `json:"isRemoveHotComment"`
+}
+
+type HotComments struct {
+	User       *User        `json:"user"`
+	BeReplied  []*BeReplied `json:"beReplied"`
+	Time       int64        `json:"time"`
+	LikedCount int          `json:"likedCount"`
+	Liked      bool         `json:"liked"`
+	CommentId  int64        `json:"commentId"`
+	Content    string       `json:"content"`
 }
 
 type User struct {
 	LocationInfo *LocationInfo `json:"-"`
-	UserType     int           `json:"user_type"`
+	UserType     int           `json:"userType"`
 	ExpertTags   *ExpertTag    `json:"-"`
-	UserId       int64         `json:"user_id"`
-	NickName     string        `json:"nick_name"`
+	UserId       int64         `json:"userId"`
+	NickName     string        `json:"nickName"`
 	Experts      *Expert       `json:"-"`
-	AuthStatus   int           `json:"auth_status"`
+	AuthStatus   int           `json:"authStatus"`
 	RemarkName   *RemarkName   `json:"-"`
-	AvatarUrl    string        `json:"avatar_url"`
-	VipType      int           `json:"vip_type"`
+	AvatarUrl    string        `json:"avatarUrl"`
+	VipType      int           `json:"vipType"`
+}
+
+type BeReplied struct {
+	User    *User  `json:"user"`
+	Content string `json:"content"`
+	Status  int    `json:"status"`
 }
 
 type LocationInfo struct {
