@@ -33,6 +33,9 @@ func GetComments(id string, offset int, limit int) (comment *models.Comment, err
 	// 发送POST请求得到最后包含url的结果
 	comment,err = Comments(params1, key1, id)
 
+
+
+
 	if err != nil {
 		fmt.Println(err)
 		return comment, err
@@ -40,21 +43,23 @@ func GetComments(id string, offset int, limit int) (comment *models.Comment, err
 	return comment, err
 }
 
-func GetAllComment(id string) (Comment []*models.Comment, err error) {
+func GetAllComment(id string) (data interface{}, err error) {
+	var comments []*models.Comments
 	offset := 0
 	for {
 		data, err := GetComments(id, offset, offset+20)
 		if err != nil {
-			return Comment, err
+			return data, err
 		}
-		Comment =append(Comment,data)
-
-		fmt.Println(data)
+		//此处开启协程将数据存入数据库
+		fmt.Println(data.Comments[0].User.NickName)
+		fmt.Println(data.Total)
 		if offset > int(data.Total) {
 			break
 		}
+		offset+=20
 	}
-	return
+	return comments,err
 }
 
 func Comments(params string, encSecKey string, id string) (comment *models.Comment,err error) {
