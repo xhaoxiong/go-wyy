@@ -1,9 +1,10 @@
 package models
 
-type Comment struct {
+type Commentt struct {
+	Id          int64
 	IsMusician  bool           `json:"isMusician"`
 	UserId      int32          `json:"userId"`
-	TopComments []string       `json:"topComments"`
+	//TopComments []string       `json:"topComments";gorm:"-"`
 	MoreHot     bool           `json:"moreHot"`
 	HotComments []*HotComments `json:"hotComments"`
 	Code        int            `json:"code"`
@@ -13,7 +14,9 @@ type Comment struct {
 }
 
 type Comments struct {
+	Id                 int64
 	User               *User        `json:"user"`
+	UserID             int64
 	BeReplied          []*BeReplied `json:"beReplied"`
 	Time               int64        `json:"time"`
 	LikedCount         int          `json:"likedCount"`
@@ -21,9 +24,11 @@ type Comments struct {
 	CommentId          int64        `json:"commentId"`
 	Content            string       `json:"content"`
 	IsRemoveHotComment bool         `json:"isRemoveHotComment"`
+	CommenttID          int64
 }
 
 type HotComments struct {
+	Id         int64
 	User       *User        `json:"user"`
 	BeReplied  []*BeReplied `json:"beReplied"`
 	Time       int64        `json:"time"`
@@ -34,6 +39,7 @@ type HotComments struct {
 }
 
 type User struct {
+	Id           int64
 	LocationInfo *LocationInfo `json:"-"`
 	UserType     int           `json:"userType"`
 	ExpertTags   *ExpertTag    `json:"-"`
@@ -47,9 +53,13 @@ type User struct {
 }
 
 type BeReplied struct {
-	User    *User  `json:"user"`
-	Content string `json:"content"`
-	Status  int    `json:"status"`
+	Id            int64
+	User          *User  `json:"user"`
+	UserID        int64
+	Content       string `json:"content"`
+	Status        int    `json:"status"`
+	CommentsID    int64
+	HotCommentsID int64
 }
 
 type LocationInfo struct {

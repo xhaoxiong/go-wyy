@@ -17,10 +17,8 @@ import (
 	limit:每次请求条数
 	offset:请求起始点
  */
-func GetComments(id string, offset int, limit int) (comment *models.Comment, err error) {
-	if id != "" {
-		id = "404465600"
-	}
+func GetComments(id  string, offset int, limit int) (comment *models.Commentt, err error) {
+
 	rid := ""
 	strOffset := strconv.Itoa(offset)
 	strLimit := strconv.Itoa(limit)
@@ -31,10 +29,7 @@ func GetComments(id string, offset int, limit int) (comment *models.Comment, err
 		panic(err)
 	}
 	// 发送POST请求得到最后包含url的结果
-	comment,err = Comments(params1, key1, id)
-
-
-
+	comment, err = Comments(params1, key1, id)
 
 	if err != nil {
 		fmt.Println(err)
@@ -43,32 +38,36 @@ func GetComments(id string, offset int, limit int) (comment *models.Comment, err
 	return comment, err
 }
 
-func GetAllComment(id string) (data interface{}, err error) {
+func GetAllComment(id  string) (data interface{}, err error) {
 	var comments []*models.Comments
 	offset := 0
+	fmt.Printf("开始获取%s的所有评论\n", id)
+
 	for {
 		data, err := GetComments(id, offset, offset+20)
 		if err != nil {
 			return data, err
 		}
+
 		//此处开启协程将数据存入数据库
-		fmt.Println(data.Comments[0].User.NickName)
-		fmt.Println(data.Total)
+		//fmt.Println(data.Comments[0].User.NickName)
+		//fmt.Println(data.Total)
 		if offset > int(data.Total) {
+			fmt.Printf("停止获取%s的所有评论\n", id)
 			break
 		}
-		offset+=20
+		offset += 20
 	}
-	return comments,err
+	return comments, err
 }
 
-func Comments(params string, encSecKey string, id string) (comment *models.Comment,err error) {
+func Comments(params string, encSecKey string, id  string) (comment *models.Commentt, err error) {
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("params", params)
 	form.Set("encSecKey", encSecKey)
 	body := strings.NewReader(form.Encode())
-	request, _ := http.NewRequest("POST", "http://music.163.com/weapi/v1/resource/comments/R_SO_4_"+id+"?csrf_token=", body)
+	request, _ := http.NewRequest("POST", "http://music.163.com/weapi/v1/resource/comments/R_SO_4_" + id+"?csrf_token=", body)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Referer", "http://music.163.com")
 	request.Header.Set("Content-Length", (string)(body.Len()))
@@ -79,15 +78,15 @@ func Comments(params string, encSecKey string, id string) (comment *models.Comme
 	// 错误处理
 	if reqErr != nil {
 		fmt.Println("Fatal error ", reqErr.Error())
-		return comment,reqErr
+		return comment, reqErr
 	}
 	defer response.Body.Close()
 	resBody, _ := ioutil.ReadAll(response.Body)
 	err = json.Unmarshal(resBody, &comment)
 	if err != nil {
 		fmt.Println(err)
-		return comment,err
+		return comment, err
 	}
-	return comment,nil
+	return comment, nil
 
 }

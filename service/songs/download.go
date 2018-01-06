@@ -11,9 +11,27 @@ import (
 	"encoding/json"
 )
 
+
+/**
+ids: [歌曲id]
+rate :320000 普通品质
+	  640000 高级品质
+      160000 低级品质
+*/
+func GetDownloadUrl(id string, rate string) (data *models.DownloadData, err error) {
+	var DownloadData *models.DownloadData
+	initStr := `{"ids": "` + id + `", "br": "` + rate + `", "csrf_token": ""}`
+	params, key, err := encrypt.EncParams(initStr)
+	if err != nil {
+		panic(err)
+	}
+	DownloadData, err = Download(params, key)
+	return DownloadData, err
+}
+
 // Download 根据传入id返回生成的mp3地址
-func Download(params string, encSecKey string) (data models.DownloadData, err error) {
-	var DownloadData models.DownloadData
+func Download(params string, encSecKey string) (data *models.DownloadData, err error) {
+	var DownloadData *models.DownloadData
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("params", params)
@@ -36,22 +54,7 @@ func Download(params string, encSecKey string) (data models.DownloadData, err er
 	if err != nil {
 		panic(err)
 	}
-
 	return DownloadData, err
 }
 
-/**
-rate :320000 普通品质
-	  640000 高级品质
-      160000 低级品质
-*/
-func GetDownloadUrl(id string, rate string) (data models.DownloadData, err error) {
-	var DownloadData models.DownloadData
-	initStr := `{"ids": "` + id + `", "br": "` + rate + `", "csrf_token": ""}`
-	params, key, err := encrypt.EncParams(initStr)
-	if err != nil {
-		panic(err)
-	}
-	DownloadData, err = Download(params, key)
-	return DownloadData, err
-}
+
