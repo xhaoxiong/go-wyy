@@ -14,22 +14,21 @@ import (
 
 var DB *gorm.DB
 
-func SyncDB() {
+func SyncDB(db_name string, db_pass string) {
 	createDB()
-	Connect()
+	Connect(db_name, db_pass)
 	DB.
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
-		&User{},
 		&AdminUser{},
 		&Commentt{},
 		&Comments{},
 		&HotComments{},
-		&BeReplied{},
 		&Song{},
+		&User{},
 	)
 }
-func AddAdmin()  {
+func AddAdmin() {
 	var user AdminUser
 	fmt.Println("please input username for system administrator")
 	var name string
@@ -49,11 +48,9 @@ func AddAdmin()  {
 	}
 }
 
-func Connect()  {
+func Connect(db_user string, db_pass string) {
 	db_host := "127.0.0.1"
 	db_port := "3306"
-	db_user := "root"
-	db_pass := "8080"
 	db_name := "wyy"
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&loc=%s&parseTime=true",
@@ -73,18 +70,17 @@ func Connect()  {
 	}
 
 	DB.SingularTable(true)
-	DB.DB().SetMaxOpenConns(2000)
-	DB.DB().SetMaxIdleConns(200)
-	DB.DB().SetConnMaxLifetime(1 * time.Second)
+	DB.DB().SetMaxOpenConns(100000)
+	DB.DB().SetMaxIdleConns(50000)
+	DB.DB().SetConnMaxLifetime(100 * time.Nanosecond)
 }
-
 
 func createDB() {
 
 	db_host := "127.0.0.1"
 	db_port := "3306"
 	db_user := "root"
-	db_pass := "8080"
+	db_pass := "971129XLZ"
 	db_name := "wyy"
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&loc=%s&parseTime=true", db_user, db_pass, db_host, db_port, url.QueryEscape("Asia/Shanghai"))

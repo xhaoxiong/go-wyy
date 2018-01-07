@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"go-wyy/models"
 	"encoding/json"
+	"time"
+	"log"
+	"sync"
 )
 
 /**
@@ -17,7 +20,7 @@ import (
 	limit:每次请求条数
 	offset:请求起始点
  */
-func GetComments(id  string, offset int, limit int) (comment *models.Commentt, err error) {
+func GetComments(id string, offset int, limit int) (comment *models.Commentt, err error) {
 
 	rid := ""
 	strOffset := strconv.Itoa(offset)
@@ -38,36 +41,56 @@ func GetComments(id  string, offset int, limit int) (comment *models.Commentt, e
 	return comment, err
 }
 
-func GetAllComment(id  string) (data interface{}, err error) {
+func GetAllComment(songid string,wg *sync.WaitGroup) (data interface{}, err error) {
+	defer  wg.Done()
 	var comments []*models.Comments
 	offset := 0
-	fmt.Printf("开始获取%s的所有评论\n", id)
+	fmt.Printf("开始获取歌曲id:%s的所有评论\n", songid)
+	time.Sleep(1 * time.Millisecond)
 
+	i := 0
+	startTime := time.Now()
 	for {
-		data, err := GetComments(id, offset, offset+20)
+		data, err := GetComments(songid, offset, offset+40)
 		if err != nil {
 			return data, err
 		}
+		var commentt models.Commentt
+		conn := models.DB
+		if data != nil {
+			commentt.IsMusician = data.IsMusician
+			commentt.Total = data.Total
+			commentt.More = data.More
+			commentt.MoreHot = data.MoreHot
+			commentt.UserId = data.UserId
+			commentt.Comments = data.Comments
+			commentt.SongId = songid
+			commentt.HotComments=data.HotComments
+			if err := conn.Create(&commentt).Error; err != nil {
+				log.Println(err)
+			}
+			i++
+			if offset > int(data.Total) {
+				log.Printf("这首歌一共请求%d次获取所有评论\n", i)
+				fmt.Printf("停止获取歌曲id:%s的所有评论\n", songid)
+				log.Println("获取这首歌所有评论一共花费时间:", time.Now().Sub(startTime))
+				break
+			}
 
-		//此处开启协程将数据存入数据库
-		//fmt.Println(data.Comments[0].User.NickName)
-		//fmt.Println(data.Total)
-		if offset > int(data.Total) {
-			fmt.Printf("停止获取%s的所有评论\n", id)
-			break
+			offset += 20
 		}
-		offset += 20
+
 	}
 	return comments, err
 }
 
-func Comments(params string, encSecKey string, id  string) (comment *models.Commentt, err error) {
+func Comments(params string, encSecKey string, id string) (comment *models.Commentt, err error) {
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("params", params)
 	form.Set("encSecKey", encSecKey)
 	body := strings.NewReader(form.Encode())
-	request, _ := http.NewRequest("POST", "http://music.163.com/weapi/v1/resource/comments/R_SO_4_" + id+"?csrf_token=", body)
+	request, _ := http.NewRequest("POST", "http://music.163.com/weapi/v1/resource/comments/R_SO_4_"+id+"?csrf_token=", body)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Referer", "http://music.163.com")
 	request.Header.Set("Content-Length", (string)(body.Len()))

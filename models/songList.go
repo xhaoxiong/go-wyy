@@ -6,7 +6,7 @@ type Song struct {
 	SongId      string
 	Title       string
 	DownloadUrl string
-	PlayListID  int64
+	UserId      string
 }
 
 type PlayList struct {

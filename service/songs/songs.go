@@ -4,8 +4,12 @@ import (
 	"net/http"
 	"github.com/PuerkitoBio/goquery"
 	"go-wyy/models"
-	"go-wyy/service/comment"
 	"github.com/astaxie/beego"
+	"fmt"
+	"go-wyy/service/comment"
+	"log"
+	"sync"
+	"time"
 )
 
 /**
@@ -33,19 +37,27 @@ func Songs(userId string) {
 	if err != nil {
 		panic(err)
 	}
-	var playList models.PlayList
-	var songs []models.Song
-	var song models.Song
 
+	g := 0
+	wg := &sync.WaitGroup{}
+	//interval := int64(90)
 	//medium:=make(chan string,10)
 	doc.Find("ul[class=f-hide] a").Each(func(i int, selection *goquery.Selection) {
 		/*开启协程插入数据库，并且开启协程请求每首歌的评论*/
 		songIdUrl, _ := selection.Attr("href")
 		title := selection.Text()
+		var song models.Song
+		//歌曲id
 		songId := songIdUrl[9:len(songIdUrl)]
 		song.SongId = songId
+
+		///song?id=歌曲id
 		song.SongUrlId = songIdUrl
+
+		//歌曲标题
 		song.Title = title
+
+		//获取歌曲下载链接
 		download, err := GetDownloadUrl(songId, "320000")
 		if err != nil {
 			panic(err)
@@ -53,26 +65,27 @@ func Songs(userId string) {
 		if len(download.Data) != 0 {
 			song.DownloadUrl = download.Data[0].Url
 		}
-		songs = append(songs, song)
+		fmt.Println(download.Data[0].Url)
 
-		//medium<-songId
-		//fmt.Println(<-medium)
-		go comment.GetAllComment(songId)
-	})
+		song.SongId = songId
+		song.DownloadUrl = download.Data[0].Url
+		song.Title = title
+		song.SongUrlId = songIdUrl
+		song.UserId = userId
 
-	for _, v := range songs {
-		song.Id = 0
-		song.SongId = v.SongId
-		song.DownloadUrl = v.DownloadUrl
-		song.Title = v.Title
-		song.SongUrlId = v.SongUrlId
 		if err := models.DB.Create(&song).Error; err != nil {
 			beego.Debug(err)
 		}
+		log.Printf("正在获取第%d首歌曲", i+1)
+		log.Printf("正在开启%d个协程", g+1)
+		if (i%200 == 0 && i >= 200) {
+			time.Sleep(300 * time.Second)
+		} else {
+			go comment.GetAllComment(songId, wg)
+		}
 
-	}
-	playList.UserId = userId
-	playList.Songs = songs
-	//将歌单插入数据库
-
+		g++
+		wg.Add(1)
+	})
+	wg.Wait()
 }

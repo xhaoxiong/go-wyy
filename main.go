@@ -1,48 +1,36 @@
 package main
 
 import (
-
-	"go-wyy/service/songs"
 	"go-wyy/models"
 	"os"
 	"starvote/task"
-	"time"
+	"go-wyy/service/songs"
 )
 
 func main() {
-		//data,err:=songs.GetDownloadUrl("[497034035]","320000")
-		//if err!=nil{
-		//	fmt.Println(err)
-		//}
-		//fmt.Println(data.Data[0].Url)
-		initArgs()
-		models.Connect()
-
-		songs.Songs("462312279")
-	time.Sleep(10000000*time.Second)
-		//comment1,err:=comment.GetAllComment("404465600")
-		////comment,err:=comment.GetComments("404465600",0,20)
-		//if err!=nil{
-		//	panic(err)
-		//}
-		//fmt.Println(comment1)
-	}
-
+	initArgs()
+	db_name := "root"
+	db_pass := "971129XLZ"
+	models.Connect(db_name, db_pass)
+	songs.Songs("462312279")
+}
 
 func initArgs() {
 	args := os.Args
+	db_name := "root"
+	db_pass := "971129XLZ"
 	for _, v := range args {
 		if v == "-syncdb" {
-			models.SyncDB()
+			models.SyncDB(db_name,db_pass)
 			os.Exit(0)
 		}
 		if v == "-admin" {
-			models.Connect()
+			models.Connect(db_name, db_pass)
 			models.AddAdmin()
 			os.Exit(0)
 		}
 		if v == "-clean" {
-			models.Connect()
+			models.Connect(db_name, db_pass)
 			task.CleanRepeat()
 			os.Exit(0)
 		}

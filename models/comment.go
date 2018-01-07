@@ -1,9 +1,9 @@
 package models
 
 type Commentt struct {
-	Id          int64
-	IsMusician  bool           `json:"isMusician"`
-	UserId      int32          `json:"userId"`
+	Id         int64
+	IsMusician bool  `json:"isMusician"`
+	UserId     int32 `json:"userId"`
 	//TopComments []string       `json:"topComments";gorm:"-"`
 	MoreHot     bool           `json:"moreHot"`
 	HotComments []*HotComments `json:"hotComments"`
@@ -11,31 +11,34 @@ type Commentt struct {
 	Comments    []*Comments    `json:"comments"`
 	Total       int64          `json:"total"`
 	More        bool           `json:"more"`
+	SongId      string
 }
 
 type Comments struct {
 	Id                 int64
 	User               *User        `json:"user"`
-	UserID             int64
-	BeReplied          []*BeReplied `json:"beReplied"`
+	BeReplied          []*BeReplied `json:"-"`
 	Time               int64        `json:"time"`
 	LikedCount         int          `json:"likedCount"`
 	Liked              bool         `json:"liked"`
 	CommentId          int64        `json:"commentId"`
-	Content            string       `json:"content"`
+	Content            string       `json:"content";gorm:"type:longtext"`
 	IsRemoveHotComment bool         `json:"isRemoveHotComment"`
-	CommenttID          int64
+	Commentt           *Commentt
+	CommenttID         int64
 }
 
 type HotComments struct {
 	Id         int64
 	User       *User        `json:"user"`
-	BeReplied  []*BeReplied `json:"beReplied"`
+	BeReplied  []*BeReplied `json:"-"`
 	Time       int64        `json:"time"`
 	LikedCount int          `json:"likedCount"`
 	Liked      bool         `json:"liked"`
 	CommentId  int64        `json:"commentId"`
-	Content    string       `json:"content"`
+	Content    string       `json:"content";gorm:"type:longtext"`
+	Commentt   *Commentt
+	CommenttID int64
 }
 
 type User struct {
@@ -50,11 +53,13 @@ type User struct {
 	RemarkName   *RemarkName   `json:"-"`
 	AvatarUrl    string        `json:"avatarUrl"`
 	VipType      int           `json:"vipType"`
+	Comments     *Comments
+	CommentsID   int64
 }
 
 type BeReplied struct {
 	Id            int64
-	User          *User  `json:"user"`
+	User          *User  `json:"-"`
 	UserID        int64
 	Content       string `json:"content"`
 	Status        int    `json:"status"`
