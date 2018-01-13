@@ -40,8 +40,7 @@ func Songs(userId string) {
 
 	g := 0
 	wg := &sync.WaitGroup{}
-	//interval := int64(90)
-	//medium:=make(chan string,10)
+
 	doc.Find("ul[class=f-hide] a").Each(func(i int, selection *goquery.Selection) {
 		/*开启协程插入数据库，并且开启协程请求每首歌的评论*/
 		songIdUrl, _ := selection.Attr("href")
@@ -71,6 +70,7 @@ func Songs(userId string) {
 		song.DownloadUrl = download.Data[0].Url
 		song.Title = title
 		song.SongUrlId = songIdUrl
+
 		song.UserId = userId
 
 		if err := models.DB.Create(&song).Error; err != nil {
@@ -79,7 +79,7 @@ func Songs(userId string) {
 		log.Printf("正在获取第%d首歌曲", i+1)
 		log.Printf("正在开启%d个协程", g+1)
 		if (i%200 == 0 && i >= 200) {
-			time.Sleep(300 * time.Second)
+			time.Sleep(450 * time.Second)
 		} else {
 			go comment.GetAllComment(songId, wg)
 		}

@@ -10,13 +10,32 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"database/sql"
+
+	"go-wyy/service/conf"
 )
 
 var DB *gorm.DB
 
-func SyncDB(db_name string, db_pass string) {
+
+
+var dbconf *conf.DbConf
+var db_host,db_port,db_name,db_user,db_pass string
+func init() {
+
+	dbconf, err := dbconf.Load("database.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	db_host = dbconf.DbHost
+	db_port = dbconf.DbPort
+	db_name = dbconf.DbName
+	db_user = dbconf.DbUser
+	db_pass = dbconf.DbPass
+}
+
+func SyncDB() {
 	createDB()
-	Connect(db_name, db_pass)
+	Connect()
 	DB.
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
@@ -48,11 +67,7 @@ func AddAdmin() {
 	}
 }
 
-func Connect(db_user string, db_pass string) {
-	db_host := "127.0.0.1"
-	db_port := "3306"
-	db_name := "wyy"
-
+func Connect() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&loc=%s&parseTime=true",
 		db_user,
 		db_pass,
@@ -70,18 +85,12 @@ func Connect(db_user string, db_pass string) {
 	}
 
 	DB.SingularTable(true)
-	DB.DB().SetMaxOpenConns(100000)
-	DB.DB().SetMaxIdleConns(50000)
+	DB.DB().SetMaxOpenConns(2000)
+	DB.DB().SetMaxIdleConns(100)
 	DB.DB().SetConnMaxLifetime(100 * time.Nanosecond)
 }
 
 func createDB() {
-
-	db_host := "127.0.0.1"
-	db_port := "3306"
-	db_user := "root"
-	db_pass := "971129XLZ"
-	db_name := "wyy"
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&loc=%s&parseTime=true", db_user, db_pass, db_host, db_port, url.QueryEscape("Asia/Shanghai"))
 	sqlstring := fmt.Sprintf("CREATE DATABASE  if not exists `%s` CHARSET utf8mb4 COLLATE utf8mb4_general_ci", db_name)

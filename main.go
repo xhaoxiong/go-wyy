@@ -4,33 +4,53 @@ import (
 	"go-wyy/models"
 	"os"
 	"starvote/task"
-	"go-wyy/service/songs"
 )
+
 
 func main() {
 	initArgs()
-	db_name := "root"
-	db_pass := "971129XLZ"
-	models.Connect(db_name, db_pass)
-	songs.Songs("462312279")
+
+	/**
+		歌单所有评论思路：进入个人歌单，获取歌曲id，爬取评论
+
+
+	*/
+
+	//评论测试
+	//data,err:=comment.GetComments("460628744", 0, 40)
+	//
+	//if err!=nil{
+	//	panic(err)
+	//}
+	//fmt.Println("isMusician",data.IsMusician)
+	//fmt.Println("Total",data.Total)
+	//fmt.Println("HotComment",data.HotComments)
+	//fmt.Println("Code",data.Code)
+	//fmt.Println("More Hot",data.MoreHot)
+	//
+	//
+	models.Connect()
+
+
+	//songs.Songs("462312279")
 }
+
 
 func initArgs() {
 	args := os.Args
-	db_name := "root"
-	db_pass := "971129XLZ"
+
 	for _, v := range args {
 		if v == "-syncdb" {
-			models.SyncDB(db_name,db_pass)
+			models.SyncDB()
 			os.Exit(0)
 		}
 		if v == "-admin" {
-			models.Connect(db_name, db_pass)
+			models.Connect()
 			models.AddAdmin()
 			os.Exit(0)
 		}
 		if v == "-clean" {
-			models.Connect(db_name, db_pass)
+			models.Connect()
 			task.CleanRepeat()
 			os.Exit(0)
 		}

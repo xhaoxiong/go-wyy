@@ -9,6 +9,7 @@ import (
 	"go-wyy/service/encrypt"
 	"go-wyy/models"
 	"encoding/json"
+	"time"
 )
 
 
@@ -37,6 +38,7 @@ func Download(params string, encSecKey string) (data *models.DownloadData, err e
 	form.Set("params", params)
 	form.Set("encSecKey", encSecKey)
 	body := strings.NewReader(form.Encode())
+	time.Sleep(500*time.Microsecond)
 	request, _ := http.NewRequest("POST", "http://music.163.com/weapi/song/enhance/player/url?csrf_token=", body)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Content-Length", (string)(body.Len()))
