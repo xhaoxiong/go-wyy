@@ -57,7 +57,7 @@ func GetAllComment(songid string,wg *sync.WaitGroup) (data interface{}, err erro
 			return data, err
 		}
 		var commentt models.Commentt
-		conn := models.DB
+		//conn := models.DB
 		if data != nil {
 			commentt.IsMusician = data.IsMusician
 			commentt.Total = data.Total
@@ -67,9 +67,9 @@ func GetAllComment(songid string,wg *sync.WaitGroup) (data interface{}, err erro
 			commentt.Comments = data.Comments
 			commentt.SongId = songid
 			commentt.HotComments=data.HotComments
-			if err := conn.Create(&commentt).Error; err != nil {
-				log.Println(err)
-			}
+			//if err := conn.Create(&commentt).Error; err != nil {
+			//	log.Println(err)
+			//}
 			i++
 			if offset > int(data.Total) {
 				log.Printf("这首歌一共请求%d次获取所有评论\n", i)

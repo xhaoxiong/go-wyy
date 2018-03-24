@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"github.com/PuerkitoBio/goquery"
 	"go-wyy/models"
-	"github.com/astaxie/beego"
-	"fmt"
 	"go-wyy/service/comment"
 	"log"
 	"sync"
@@ -57,28 +55,28 @@ func Songs(userId string) {
 		song.Title = title
 
 		//获取歌曲下载链接
-		download, err := GetDownloadUrl(songId, "320000")
-		if err != nil {
-			panic(err)
-		}
-		if len(download.Data) != 0 {
-			song.DownloadUrl = download.Data[0].Url
-		}
-		fmt.Println(download.Data[0].Url)
+		//download, err := GetDownloadUrl(songId, "320000")
+		//if err != nil {
+		//	panic(err)
+		//}
+		//if len(download.Data) != 0 {
+		//	song.DownloadUrl = download.Data[0].Url
+		//}
+		//fmt.Println(download.Data[0].Url)
 
 		song.SongId = songId
-		song.DownloadUrl = download.Data[0].Url
+		//song.DownloadUrl = download.Data[0].Url
 		song.Title = title
 		song.SongUrlId = songIdUrl
 
 		song.UserId = userId
 
-		if err := models.DB.Create(&song).Error; err != nil {
-			beego.Debug(err)
-		}
+		//if err := models.DB.Create(&song).Error; err != nil {
+		//	beego.Debug(err)
+		//}
 		log.Printf("正在获取第%d首歌曲", i+1)
 		log.Printf("正在开启%d个协程", g+1)
-		if (i%200 == 0 && i >= 200) {
+		if i%200 == 0 && i >= 200 {
 			time.Sleep(450 * time.Second)
 		} else {
 			go comment.GetAllComment(songId, wg)

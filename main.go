@@ -4,6 +4,9 @@ import (
 	"go-wyy/models"
 	"os"
 	"starvote/task"
+	"fmt"
+	"go-wyy/service/comment"
+	"go-wyy/service/songs"
 )
 
 
@@ -17,22 +20,22 @@ func main() {
 	*/
 
 	//评论测试
-	//data,err:=comment.GetComments("460628744", 0, 40)
-	//
-	//if err!=nil{
-	//	panic(err)
-	//}
-	//fmt.Println("isMusician",data.IsMusician)
-	//fmt.Println("Total",data.Total)
-	//fmt.Println("HotComment",data.HotComments)
-	//fmt.Println("Code",data.Code)
-	//fmt.Println("More Hot",data.MoreHot)
-	//
-	//
-	models.Connect()
+	data,err:=comment.GetComments("460628744", 0, 40)
+
+	if err!=nil{
+		panic(err)
+	}
+	fmt.Println("isMusician",data.IsMusician)
+	fmt.Println("Total",data.Total)
+	fmt.Println("HotComment",data.HotComments)
+	fmt.Println("Code",data.Code)
+	fmt.Println("More Hot",data.MoreHot)
 
 
-	//songs.Songs("462312279")
+	//models.Connect()
+
+
+	songs.Songs("462312279")
 }
 
 
