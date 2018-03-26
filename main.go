@@ -6,7 +6,6 @@ import (
 	"starvote/task"
 	"fmt"
 	"go-wyy/service/comment"
-	"go-wyy/service/songs"
 )
 
 
@@ -32,10 +31,10 @@ func main() {
 	fmt.Println("More Hot",data.MoreHot)
 
 
-	//models.Connect()
+	models.Connect()
 
 
-	songs.Songs("462312279")
+	//songs.Songs("462312279")
 }
 
 
