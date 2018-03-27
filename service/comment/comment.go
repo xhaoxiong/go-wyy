@@ -56,20 +56,16 @@ func GetAllComment(songid string,wg *sync.WaitGroup) (data interface{}, err erro
 		if err != nil {
 			return data, err
 		}
-		var commentt models.Commentt
-		//conn := models.DB
+		//var commentt models.Commentt
 		if data != nil {
-			commentt.IsMusician = data.IsMusician
-			commentt.Total = data.Total
-			commentt.More = data.More
-			commentt.MoreHot = data.MoreHot
-			commentt.UserId = data.UserId
-			commentt.Comments = data.Comments
-			commentt.SongId = songid
-			commentt.HotComments=data.HotComments
-			//if err := conn.Create(&commentt).Error; err != nil {
-			//	log.Println(err)
-			//}
+			//commentt.IsMusician = data.IsMusician
+			//commentt.Total = data.Total
+			//commentt.More = data.More
+			//commentt.MoreHot = data.MoreHot
+			//commentt.UserId = data.UserId
+			//commentt.Comments = data.Comments
+			//commentt.SongId = songid
+			//commentt.HotComments=data.HotComments
 			i++
 			if offset > int(data.Total) {
 				log.Printf("这首歌一共请求%d次获取所有评论\n", i)
@@ -85,6 +81,7 @@ func GetAllComment(songid string,wg *sync.WaitGroup) (data interface{}, err erro
 	return comments, err
 }
 
+//获取某首歌的评论
 func Comments(params string, encSecKey string, id string) (comment *models.Commentt, err error) {
 	client := &http.Client{}
 	form := url.Values{}
@@ -105,8 +102,15 @@ func Comments(params string, encSecKey string, id string) (comment *models.Comme
 		return comment, reqErr
 	}
 	defer response.Body.Close()
+
+	if response.StatusCode!=http.StatusOK{
+		fmt.Println("Error:status code", response.StatusCode)
+		return nil, fmt.Errorf("wrong status code:%d", response.StatusCode)
+	}
+
+
 	resBody, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(resBody))
+
 	err = json.Unmarshal(resBody, &comment)
 	if err != nil {
 		fmt.Println(err)

@@ -1,8 +1,13 @@
 package engin
 
+import (
+	"io"
+)
+
 type Request struct {
-	Url        string
-	Parser func([]byte) ParseResult
+	Url           string
+	ParserComment func([]byte) ParseResult
+	ParserSong    func(reader io.Reader) ParseResult
 }
 
 type ParseResult struct {

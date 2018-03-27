@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"strconv"
 	"go-wyy/service/encrypt"
+	"time"
+	"log"
 )
 
 
@@ -26,6 +28,25 @@ func GetComments(id string, offset int, limit int)([]byte, error) {
 	return FetchComments(params1, key1, id)
 
 }
+
+func GetAllComment(songid string) ([]byte,error) {
+	offset := 0
+	fmt.Printf("开始获取歌曲id:%s的所有评论\n", songid)
+	for {
+
+		data, err := GetComments(songid, offset, offset+40)
+		if err != nil {
+
+			break
+		}
+		if data != nil {
+			offset += 20
+		}
+
+	}
+}
+
+
 
 
 
