@@ -9,13 +9,16 @@ import (
 	"ccmous/mooc/crawler/engine"
 	"io"
 	"github.com/PuerkitoBio/goquery"
+	"go-wyy/v2.0/fetcher"
+	"sync"
+	"go-wyy/v2.0/parse"
 )
 
 func main() {
-
+	//ticker := time.Tick(200 * time.Millisecond)
 	engin.Run(
 		engin.Request{
-			Url: "",
+			Url:           "",
 			ParserComment: engin.NilParser,
 			ParserSong: func(reader io.Reader) engin.ParseResult {
 				doc, err := goquery.NewDocumentFromReader(reader)
@@ -24,6 +27,7 @@ func main() {
 					panic(err)
 				}
 
+				wg := &sync.WaitGroup{}
 				result := engin.ParseResult{}
 				doc.Find("ul[class=f-hide] a").Each(func(i int, selection *goquery.Selection) {
 					/*开启协程插入数据库，并且开启协程请求每首歌的评论*/
@@ -39,15 +43,15 @@ func main() {
 
 					//歌曲标题
 					song.Title = title
-					fmt.Printf("歌曲题目:%s\n", title)
+					//fmt.Printf("歌曲题目:%s\n", title)
 					result.Items = append(result.Items, "歌曲信息:", song)
-					go func() {
 
-					}()
-					//song.UserId = userId
-
-
+					songComment := make(chan []byte, 100)
+					go fetcher.GetAllComment(songId, wg, songComment)
+					go parse.ReceiveComment(songComment, wg)
+					wg.Add(1)
 				})
+				wg.Wait()
 				return result
 			},
 		})
