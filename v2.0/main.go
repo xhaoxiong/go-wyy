@@ -1,21 +1,22 @@
 package main
 
 import (
-	"go-wyy/v2.0/engin"
 
 	"fmt"
 	"encoding/json"
 	"go-wyy/models"
 	"ccmous/mooc/crawler/engine"
+	"go-wyy/v2.0/engin"
 	"io"
 	"github.com/PuerkitoBio/goquery"
-	"go-wyy/v2.0/fetcher"
 	"sync"
+	"go-wyy/v2.0/fetcher"
 	"go-wyy/v2.0/parse"
 )
 
 func main() {
 	//ticker := time.Tick(200 * time.Millisecond)
+
 	engin.Run(
 		engin.Request{
 			Url:           "",

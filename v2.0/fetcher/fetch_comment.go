@@ -31,7 +31,6 @@ func GetComments(id string, offset int, limit int) ([]byte, error) {
 }
 
 func GetAllComment(songid string, wg *sync.WaitGroup, songComment chan []byte) {
-	defer wg.Done()
 	offset := 0
 	fmt.Printf("开始获取歌曲id:%s的所有评论\n", songid)
 	for {

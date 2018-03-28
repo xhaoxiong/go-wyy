@@ -8,6 +8,9 @@ import (
 	"go-wyy/v2.0/engin"
 	"go-wyy/v2.0/fetcher"
 	"log"
+	"gopkg.in/olivere/elastic.v5"
+	"context"
+	"fmt"
 )
 
 func ParseSong(reader io.Reader) engin.ParseResult {
@@ -39,15 +42,48 @@ func ParseSong(reader io.Reader) engin.ParseResult {
 		var songComment chan []byte
 		go fetcher.GetAllComment(songId, wg, songComment)
 		go ReceiveComment(songComment, wg)
-		wg.Add(2)
 	})
-	wg.Wait()
+
 	return result
 }
 
 func ReceiveComment(songComment chan []byte, wg *sync.WaitGroup) {
-	defer wg.Done()
-	bytes := <-songComment
+	for {
+		if bytes, ok := <-songComment; ok {
+			fmt.Println("this is me receive string:", string(bytes))
+			save(bytes)
+		} else {
+			close(songComment)
+			break
+		}
 
-	log.Println("this is me receive string:", bytes)
+	}
+
+}
+
+func save(item []byte) {
+	client, err := elastic.NewClient(
+		elastic.SetSniff(false),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	response, err := client.Index().
+		Index("wyy").
+		Type("comment").
+		BodyJson(string(item)).
+		Do(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(response)
+
+	result, err := client.Get().
+		Index("wyy").
+		Type("comment").Id("*").
+		Do(context.Background())
+
+	log.Println("this is get result:",result)
 }
