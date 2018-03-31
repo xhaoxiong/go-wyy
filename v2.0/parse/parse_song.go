@@ -7,7 +7,6 @@ import (
 	"io"
 	"go-wyy/v2.0/engin"
 	"go-wyy/v2.0/fetcher"
-	"log"
 	"gopkg.in/olivere/elastic.v5"
 	"context"
 	"fmt"
@@ -38,19 +37,29 @@ func ParseSong(reader io.Reader) engin.ParseResult {
 		song.Title = title
 		//fmt.Printf("歌曲题目:%s\n", title)
 		result.Items = append(result.Items, "歌曲信息:", song)
+		offset := 0
+		songComment := make(chan [][]byte, 100)
+		go func(offset int) {
+			for {
+				fetcher.GetComments(songId, offset, offset+40, songComment, wg)
+				offset += 40
+				wg.Add(1)
+			}
 
-		var songComment chan []byte
-		go fetcher.GetAllComment(songId, wg, songComment)
+		}(offset)
+
 		go ReceiveComment(songComment, wg)
 	})
 
 	return result
 }
 
-func ReceiveComment(songComment chan []byte, wg *sync.WaitGroup) {
+func ReceiveComment(songComment chan [][]byte, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for {
 		if bytes, ok := <-songComment; ok {
-			fmt.Println("this is me receive string:", string(bytes))
+			fmt.Println(bytes)
+			//fmt.Println(string(bytes))
 			save(bytes)
 		} else {
 			close(songComment)
@@ -61,7 +70,7 @@ func ReceiveComment(songComment chan []byte, wg *sync.WaitGroup) {
 
 }
 
-func save(item []byte) {
+func save(items [][]byte) {
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false),
 	)
@@ -69,21 +78,16 @@ func save(item []byte) {
 	if err != nil {
 		panic(err)
 	}
-
-	response, err := client.Index().
-		Index("wyy").
-		Type("comment").
-		BodyJson(string(item)).
-		Do(context.Background())
-	if err != nil {
-		panic(err)
+	for _, item := range items {
+		response, err := client.Index().
+			Index("wyy").
+			Type("comment").
+			BodyJson(string(item)).
+			Do(context.Background())
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(response)
 	}
-	fmt.Println(response)
 
-	result, err := client.Get().
-		Index("wyy").
-		Type("comment").Id("*").
-		Do(context.Background())
-
-	log.Println("this is get result:",result)
 }

@@ -14,7 +14,7 @@ import (
 
 var Tick = time.Tick(100 * time.Millisecond)
 
-func GetComments(id string, offset int, limit int) ([]byte, error) {
+func GetComments(id string, offset int, limit int, songComment chan [][]byte, wg *sync.WaitGroup) () {
 
 	rid := ""
 	strOffset := strconv.Itoa(offset)
@@ -25,25 +25,13 @@ func GetComments(id string, offset int, limit int) ([]byte, error) {
 	if err != nil {
 		panic(err)
 	}
+
 	// 发送POST请求得到最后包含url的结果
-	return FetchComments(params1, key1, id)
-
-}
-
-func GetAllComment(songid string, wg *sync.WaitGroup, songComment chan []byte) {
-	offset := 0
-	fmt.Printf("开始获取歌曲id:%s的所有评论\n", songid)
-	for {
-
-		data, err := GetComments(songid, offset, offset+40)
-		fmt.Println("this is get comment:", string(data))
-		songComment <- data
-		if err != nil {
-			break
-		}
-		if data != nil {
-			offset += 40
-		}
+	datas := make([][]byte, 0)
+	data, err := FetchComments(params1, key1, id)
+	datas = append(datas, data)
+	if len(datas) >= 3 {
+		songComment <- datas
 	}
 
 }

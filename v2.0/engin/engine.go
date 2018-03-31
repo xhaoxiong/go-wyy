@@ -24,16 +24,7 @@ func Run(seeds ...Request) {
 	//}
 }
 
-func workerComment(r Request) (ParseResult, error) {
 
-	body, err := fetcher.GetComments("460628744", 0, 40)
-	if err != nil {
-		log.Printf("Fetcher:error fetching url %s:%v", r.Url, err)
-		return ParseResult{}, err
-	}
-
-	return r.ParserComment(body), nil
-}
 
 func workerSong(r Request) (ParseResult, error) {
 	reader, err := fetcher.GetSongs("462312279")

@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"fmt"
 	"encoding/json"
 	"go-wyy/models"
@@ -46,11 +45,17 @@ func main() {
 					song.Title = title
 					//fmt.Printf("歌曲题目:%s\n", title)
 					result.Items = append(result.Items, "歌曲信息:", song)
+					offset := 0
+					songComment := make(chan [][]byte, 100)
+					go func(offset int) {
+						for {
+							fetcher.GetComments(songId, offset, offset+40, songComment, wg)
+							offset += 40
+						}
 
-					songComment := make(chan []byte, 100)
-					go fetcher.GetAllComment(songId, wg, songComment)
+					}(offset)
 					go parse.ReceiveComment(songComment, wg)
-					wg.Add(1)
+					wg.Add(2)
 				})
 				wg.Wait()
 				return result
