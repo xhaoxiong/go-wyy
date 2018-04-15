@@ -30,6 +30,9 @@ func GetComments(id string, offset int, limit int, songComment chan [][]byte, wg
 	datas := make([][]byte, 0)
 	data, err := FetchComments(params1, key1, id)
 	datas = append(datas, data)
+
+	fmt.Println("getting data:", string(data))
+	//此处是为了将尽可能多的comment获取放入一个slice中然后一次性送出去 ，方法可能比较愚笨
 	if len(datas) >= 3 {
 		songComment <- datas
 	}

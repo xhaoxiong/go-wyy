@@ -55,6 +55,7 @@ func ParseSong(reader io.Reader) engin.ParseResult {
 }
 
 func ReceiveComment(songComment chan [][]byte, wg *sync.WaitGroup) {
+	fmt.Println(<-songComment)
 	defer wg.Done()
 	for {
 		if bytes, ok := <-songComment; ok {
