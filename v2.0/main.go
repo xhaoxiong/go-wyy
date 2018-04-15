@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"encoding/json"
+
 	"go-wyy/models"
-	"ccmous/mooc/crawler/engine"
 	"go-wyy/v2.0/engin"
 	"io"
 	"github.com/PuerkitoBio/goquery"
@@ -63,6 +61,7 @@ func main() {
 		})
 }
 
+/*
 func ParseComment(content []byte) (result engine.ParseResult) {
 	var comment *models.Commentt
 	err := json.Unmarshal(content, &comment)
@@ -77,3 +76,4 @@ func ParseComment(content []byte) (result engine.ParseResult) {
 
 	return
 }
+*/
