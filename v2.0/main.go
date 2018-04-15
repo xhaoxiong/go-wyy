@@ -9,6 +9,7 @@ import (
 	"sync"
 	"go-wyy/v2.0/fetcher"
 	"go-wyy/v2.0/parse"
+	"fmt"
 )
 
 func main() {
@@ -47,6 +48,8 @@ func main() {
 					songComment := make(chan [][]byte, 100)
 					go func(offset int) {
 						for {
+							fmt.Println("Getting data")
+							//此处尽可能将多的评论（因为是API获取评论一次只有40条）放入一个slice中然后通过channel送出来
 							fetcher.GetComments(songId, offset, offset+40, songComment, wg)
 							offset += 40
 						}
