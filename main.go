@@ -3,7 +3,6 @@ package main
 import (
 	"go-wyy/models"
 	"os"
-	"starvote/task"
 	"fmt"
 	"go-wyy/service/comment"
 )
@@ -49,11 +48,6 @@ func initArgs() {
 		if v == "-admin" {
 			models.Connect()
 			models.AddAdmin()
-			os.Exit(0)
-		}
-		if v == "-clean" {
-			models.Connect()
-			task.CleanRepeat()
 			os.Exit(0)
 		}
 	}

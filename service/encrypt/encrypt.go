@@ -20,7 +20,9 @@ const iv = "0102030405060708"
 func EncParams(param string) (string, string, error) {
 	// 创建 key
 	secKey := createSecretKey(16)
+
 	aes1, err1 := aesEncrypt(param, nonce)
+
 	// 第一次加密 使用固定的 nonce
 	if err1 != nil {
 		return "", "", err1
@@ -36,11 +38,11 @@ func EncParams(param string) (string, string, error) {
 
 // 创建指定长度的key
 func createSecretKey(size int) string {
-	// 也就是从 a~9 以及 +/ 中随机拿出指定数量的字符拼成一个 key
+	// 也就是从 a~9 以及 +/ 中随机拿出指定数量的字符拼成一个 size长的key
 	rs := ""
 	for i := 0; i < size; i++ {
-		pos := rand.Intn(len(keys))
-		rs += keys[pos : pos+1]
+		pos := rand.Intn(len([]rune(keys)))
+		rs += keys[pos: pos+1]
 	}
 	return rs
 }
@@ -52,8 +54,14 @@ func aesEncrypt(sSrc string, sKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	//需要padding的数目
 	padding := block.BlockSize() - len([]byte(sSrc))%block.BlockSize()
+	//只要少于256就能放到一个byte中，默认的blockSize=16(即采用16*8=128, AES-128长的密钥)
+	//最少填充1个byte，如果原文刚好是blocksize的整数倍，则再填充一个blocksize
+
 	src := append([]byte(sSrc), bytes.Repeat([]byte{byte(padding)}, padding)...)
+
+
 	model := cipher.NewCBCEncrypter(block, iv)
 	cipherText := make([]byte, len(src))
 	model.CryptBlocks(cipherText, src)
@@ -66,7 +74,7 @@ func rsaEncrypt(key string, pubKey string, modulus string) string {
 	// 倒序 key
 	rKey := ""
 	for i := len(key) - 1; i >= 0; i-- {
-		rKey += key[i : i+1]
+		rKey += key[i: i+1]
 	}
 	// 将 key 转 ascii 编码 然后转成 16 进制字符串
 	hexRKey := ""
