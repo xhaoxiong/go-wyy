@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"encoding/json"
 	"go-wyy/models"
-	"ccmous/mooc/crawler/engine"
+	"go-wyy/v2.0/engin"
 )
 
-func ParseComment(content []byte) (result engine.ParseResult ){
+
+
+
+func ParseComment(content []byte) (result engin.ParseResult){
 	var comment *models.Commentt
 	err := json.Unmarshal(content, &comment)
 	if err != nil {
@@ -15,7 +18,7 @@ func ParseComment(content []byte) (result engine.ParseResult ){
 
 	}
 
-	result = engine.ParseResult{
+	result = engin.ParseResult{
 		Items: []interface{}{comment},
 	}
 

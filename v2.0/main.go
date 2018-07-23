@@ -44,7 +44,7 @@ func main() {
 					//fmt.Printf("歌曲题目:%s\n", title)
 					result.Items = append(result.Items, "歌曲信息:", song)
 					offset := 0
-					songComment := make(chan [][]byte, 100)
+					songComment := make(chan []byte, 100)
 
 					go func(offset int) {
 						for {

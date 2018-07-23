@@ -38,7 +38,7 @@ func ParseSong(reader io.Reader) engin.ParseResult {
 		//fmt.Printf("歌曲题目:%s\n", title)
 		result.Items = append(result.Items, "歌曲信息:", song)
 		offset := 0
-		songComment := make(chan [][]byte, 100)
+		songComment := make(chan []byte, 100)
 		go func(offset int) {
 			for {
 				fetcher.GetComments(songId, offset, offset+40, songComment, wg)
@@ -54,8 +54,7 @@ func ParseSong(reader io.Reader) engin.ParseResult {
 	return result
 }
 
-func ReceiveComment(songComment chan [][]byte, wg *sync.WaitGroup) {
-	fmt.Println(<-songComment)
+func ReceiveComment(songComment chan []byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		if bytes, ok := <-songComment; ok {
@@ -71,7 +70,7 @@ func ReceiveComment(songComment chan [][]byte, wg *sync.WaitGroup) {
 
 }
 
-func save(items [][]byte) {
+func save(item []byte) {
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false),
 	)
@@ -79,7 +78,7 @@ func save(items [][]byte) {
 	if err != nil {
 		panic(err)
 	}
-	for _, item := range items {
+
 		response, err := client.Index().
 			Index("wyy").
 			Type("comment").
@@ -89,6 +88,6 @@ func save(items [][]byte) {
 			panic(err)
 		}
 		fmt.Println(response)
-	}
+
 
 }
